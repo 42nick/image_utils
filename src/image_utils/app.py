@@ -44,14 +44,16 @@ upload_style = {
     "alignItems": "center",
     "justifyContent": "center",
 }
+IMAGE_MAX_HEIGHT = 150
 image_style = {
-    "height": "150px",
-    "width": "auto",
+    "maxHeight": f"{IMAGE_MAX_HEIGHT}px",
+    "maxWidth": "100%",
     "display": "block",
     "margin": "auto",
     "borderRadius": "5px",
     "boxShadow": "0 0 5px rgba(0,0,0,0.1)",
 }
+
 summary_info_style = {
     "backgroundColor": secondary_color,
     "padding": "20px",
@@ -223,21 +225,42 @@ def update_upload_info(contents, filenames):
 def create_image_div(compressed_image, download_filename, original_size, compressed_size):
     return html.Div(
         [
-            html.Img(src=compressed_image, style=image_style),
-            html.A(
-                "Download " + download_filename,
-                id="download-link",
-                download=download_filename,
-                href=compressed_image,
-                target="_blank",
+            html.Div(html.Img(src=compressed_image, style=image_style), style={"height": f"{IMAGE_MAX_HEIGHT}px"}),
+            html.Div(
+                html.A(
+                    "Download",
+                    id="download-link",
+                    download=download_filename,
+                    href=compressed_image,
+                    target="_blank",
+                    style={
+                        "display": "block",
+                        "textAlign": "center",
+                        "marginTop": "10px",
+                        "color": "#fff",
+                        "textDecoration": "none",
+                        "fontFamily": font_family,
+                        "fontWeight": "bold",
+                        "padding": "10px 20px",
+                        "backgroundColor": primary_color,
+                        "borderRadius": "5px",
+                    },
+                ),
+                style={"textAlign": "center"},
+            ),
+            html.Div(
+                download_filename,
+                title=download_filename,  # Add title attribute to show full filename on hover
                 style={
-                    "display": "block",
                     "textAlign": "center",
                     "marginTop": "10px",
-                    "color": primary_color,
-                    "textDecoration": "none",
                     "fontFamily": font_family,
-                    "fontWeight": "bold",
+                    "color": text_color,
+                    "fontSize": "12px",
+                    "overflow": "hidden",
+                    "textOverflow": "ellipsis",
+                    "whiteSpace": "nowrap",
+                    "width": "100%",
                 },
             ),
             html.Div(
