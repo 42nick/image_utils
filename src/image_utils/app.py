@@ -11,6 +11,15 @@ app = dash.Dash(__name__)
 
 app.layout = html.Div(
     [
+        html.H1(
+            "Image Compressor",
+            style={
+                "textAlign": "center",
+                "color": "#333",
+                "marginBottom": "20px",
+                "fontFamily": "Arial, sans-serif",
+            },
+        ),
         dcc.Upload(
             id="upload-image",
             children=html.Div(["Drag and Drop or ", html.A("Select Images")]),
@@ -23,6 +32,8 @@ app.layout = html.Div(
                 "borderRadius": "5px",
                 "textAlign": "center",
                 "margin": "10px",
+                "backgroundColor": "#f9f9f9",
+                "fontFamily": "Arial, sans-serif",
             },
             multiple=True,
         ),
@@ -50,11 +61,21 @@ app.layout = html.Div(
                 "textDecoration": "none",
                 "textAlign": "center",
                 "margin": "10px",
+                "fontFamily": "Arial, sans-serif",
             },
         ),
         html.Div(id="download-links"),
         html.Div(id="output-image-upload"),
-    ]
+    ],
+    style={
+        "maxWidth": "800px",
+        "margin": "auto",
+        "padding": "20px",
+        "boxShadow": "0 0 10px rgba(0,0,0,0.1)",
+        "borderRadius": "10px",
+        "backgroundColor": "#fff",
+        "fontFamily": "Arial, sans-serif",
+    },
 )
 
 
@@ -128,6 +149,8 @@ def update_output(compress_clicks, contents, filenames, compression_ratio):
                                     "width": "auto",
                                     "display": "block",
                                     "margin": "auto",
+                                    "borderRadius": "5px",
+                                    "boxShadow": "0 0 5px rgba(0,0,0,0.1)",
                                 },
                             ),
                             html.A(
@@ -140,6 +163,9 @@ def update_output(compress_clicks, contents, filenames, compression_ratio):
                                     "display": "block",
                                     "textAlign": "center",
                                     "marginTop": "10px",
+                                    "color": "#007bff",
+                                    "textDecoration": "none",
+                                    "fontFamily": "Arial, sans-serif",
                                 },
                             ),
                         ],
@@ -173,6 +199,7 @@ def update_output(compress_clicks, contents, filenames, compression_ratio):
                 "textDecoration": "none",
                 "textAlign": "center",
                 "margin": "10px",
+                "fontFamily": "Arial, sans-serif",
             },
         )
         return html.Div(
