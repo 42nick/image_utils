@@ -82,6 +82,7 @@ app.layout = html.Div(
 def parse_contents(contents, compression_ratio):
     content_type, content_string = contents.split(",")
     decoded = base64.b64decode(content_string)
+    original_size = len(decoded)
     image = Image.open(io.BytesIO(decoded))
 
     # Convert image to RGB if it has an alpha channel
@@ -91,9 +92,10 @@ def parse_contents(contents, compression_ratio):
     buffer = io.BytesIO()
     image.save(buffer, format="JPEG", quality=compression_ratio, optimize=True)
     buffer.seek(0)
+    compressed_size = buffer.getbuffer().nbytes
 
     encoded_image = base64.b64encode(buffer.read()).decode("utf-8")
-    return f"data:image/jpeg;base64,{encoded_image}"
+    return f"data:image/jpeg;base64,{encoded_image}", original_size, compressed_size
 
 
 @app.callback(
@@ -133,7 +135,7 @@ def update_output(compress_clicks, contents, filenames, compression_ratio):
                         },
                     ), None
 
-                compressed_image = parse_contents(content, compression_ratio)
+                compressed_image, original_size, compressed_size = parse_contents(content, compression_ratio)
                 if filename:
                     name, ext = filename.rsplit(".", 1)
                     download_filename = f"{name}_compressed.jpg"
@@ -165,6 +167,22 @@ def update_output(compress_clicks, contents, filenames, compression_ratio):
                                     "marginTop": "10px",
                                     "color": "#007bff",
                                     "textDecoration": "none",
+                                    "fontFamily": "Arial, sans-serif",
+                                },
+                            ),
+                            html.Div(
+                                f"Before: {original_size / 1024:.2f} KB",
+                                style={
+                                    "textAlign": "center",
+                                    "marginTop": "10px",
+                                    "fontFamily": "Arial, sans-serif",
+                                },
+                            ),
+                            html.Div(
+                                f"After: {compressed_size / 1024:.2f} KB",
+                                style={
+                                    "textAlign": "center",
+                                    "marginTop": "10px",
                                     "fontFamily": "Arial, sans-serif",
                                 },
                             ),
