@@ -9,32 +9,57 @@ from PIL import Image
 
 app = dash.Dash(__name__)
 
+# Define reusable style variables
+font_family = "Arial, sans-serif"
+centered_text_style = {"textAlign": "center", "fontFamily": font_family}
+button_style = {
+    "padding": "10px 20px",
+    "fontSize": "16px",
+    "color": "#fff",
+    "backgroundColor": "#007bff",
+    "border": "none",
+    "borderRadius": "5px",
+    "textDecoration": "none",
+    "fontFamily": font_family,
+}
+upload_style = {
+    "width": "100%",
+    "height": "60px",
+    "lineHeight": "60px",
+    "borderWidth": "1px",
+    "borderStyle": "dashed",
+    "borderRadius": "5px",
+    "textAlign": "center",
+    "margin": "10px",
+    "backgroundColor": "#f9f9f9",
+    "fontFamily": font_family,
+}
+image_style = {
+    "height": "150px",
+    "width": "auto",
+    "display": "block",
+    "margin": "auto",
+    "borderRadius": "5px",
+    "boxShadow": "0 0 5px rgba(0,0,0,0.1)",
+}
+summary_info_style = {
+    "backgroundColor": "#f8f9fa",
+    "padding": "20px",
+    "borderRadius": "10px",
+    "boxShadow": "0 0 10px rgba(0,0,0,0.1)",
+    "margin": "20px 0",
+}
+
 app.layout = html.Div(
     [
         html.H1(
             "Image Compressor",
-            style={
-                "textAlign": "center",
-                "color": "#333",
-                "marginBottom": "20px",
-                "fontFamily": "Arial, sans-serif",
-            },
+            style={**centered_text_style, "color": "#333", "marginBottom": "20px"},
         ),
         dcc.Upload(
             id="upload-image",
             children=html.Div(["Drag and Drop or ", html.A("Select Images")]),
-            style={
-                "width": "100%",
-                "height": "60px",
-                "lineHeight": "60px",
-                "borderWidth": "1px",
-                "borderStyle": "dashed",
-                "borderRadius": "5px",
-                "textAlign": "center",
-                "margin": "10px",
-                "backgroundColor": "#f9f9f9",
-                "fontFamily": "Arial, sans-serif",
-            },
+            style=upload_style,
             multiple=True,
         ),
         html.Div(id="upload-info", style={"textAlign": "center", "margin": "10px"}),
@@ -52,16 +77,7 @@ app.layout = html.Div(
                 "Compress Images",
                 id="compress-button",
                 n_clicks=0,
-                style={
-                    "padding": "10px 20px",
-                    "fontSize": "16px",
-                    "color": "#fff",
-                    "backgroundColor": "#007bff",
-                    "border": "none",
-                    "borderRadius": "5px",
-                    "textDecoration": "none",
-                    "fontFamily": "Arial, sans-serif",
-                },
+                style=button_style,
             ),
             style={"textAlign": "center"},
         ),
@@ -75,7 +91,7 @@ app.layout = html.Div(
         "boxShadow": "0 0 10px rgba(0,0,0,0.1)",
         "borderRadius": "10px",
         "backgroundColor": "#fff",
-        "fontFamily": "Arial, sans-serif",
+        "fontFamily": font_family,
     },
 )
 
@@ -175,14 +191,7 @@ def update_output(compress_clicks, contents, filenames, compression_ratio):
                         [
                             html.Img(
                                 src=compressed_image,
-                                style={
-                                    "height": "150px",
-                                    "width": "auto",
-                                    "display": "block",
-                                    "margin": "auto",
-                                    "borderRadius": "5px",
-                                    "boxShadow": "0 0 5px rgba(0,0,0,0.1)",
-                                },
+                                style=image_style,
                             ),
                             html.A(
                                 "Download " + download_filename,
@@ -196,7 +205,7 @@ def update_output(compress_clicks, contents, filenames, compression_ratio):
                                     "marginTop": "10px",
                                     "color": "#007bff",
                                     "textDecoration": "none",
-                                    "fontFamily": "Arial, sans-serif",
+                                    "fontFamily": font_family,
                                 },
                             ),
                             html.Div(
@@ -204,7 +213,7 @@ def update_output(compress_clicks, contents, filenames, compression_ratio):
                                 style={
                                     "textAlign": "center",
                                     "marginTop": "10px",
-                                    "fontFamily": "Arial, sans-serif",
+                                    "fontFamily": font_family,
                                 },
                             ),
                             html.Div(
@@ -212,7 +221,7 @@ def update_output(compress_clicks, contents, filenames, compression_ratio):
                                 style={
                                     "textAlign": "center",
                                     "marginTop": "10px",
-                                    "fontFamily": "Arial, sans-serif",
+                                    "fontFamily": font_family,
                                 },
                             ),
                         ],
@@ -238,19 +247,7 @@ def update_output(compress_clicks, contents, filenames, compression_ratio):
                 download="compressed_images.zip",
                 href=zip_href,
                 target="_blank",
-                style={
-                    "display": "inline-block",
-                    "padding": "10px 20px",
-                    "fontSize": "16px",
-                    "color": "#fff",
-                    "backgroundColor": "#007bff",
-                    "border": "none",
-                    "borderRadius": "5px",
-                    "textDecoration": "none",
-                    "textAlign": "center",
-                    "margin": "10px",
-                    "fontFamily": "Arial, sans-serif",
-                },
+                style=button_style,
             ),
             style={"textAlign": "center"},
         )
@@ -264,7 +261,7 @@ def update_output(compress_clicks, contents, filenames, compression_ratio):
                     style={
                         "textAlign": "center",
                         "marginTop": "10px",
-                        "fontFamily": "Arial, sans-serif",
+                        "fontFamily": font_family,
                         "fontSize": "18px",
                         "fontWeight": "bold",
                         "color": "#333",
@@ -275,7 +272,7 @@ def update_output(compress_clicks, contents, filenames, compression_ratio):
                     style={
                         "textAlign": "center",
                         "marginTop": "10px",
-                        "fontFamily": "Arial, sans-serif",
+                        "fontFamily": font_family,
                         "fontSize": "18px",
                         "fontWeight": "bold",
                         "color": "#333",
@@ -286,20 +283,14 @@ def update_output(compress_clicks, contents, filenames, compression_ratio):
                     style={
                         "textAlign": "center",
                         "marginTop": "10px",
-                        "fontFamily": "Arial, sans-serif",
+                        "fontFamily": font_family,
                         "fontSize": "18px",
                         "fontWeight": "bold",
                         "color": "#28a745",
                     },
                 ),
             ],
-            style={
-                "backgroundColor": "#f8f9fa",
-                "padding": "20px",
-                "borderRadius": "10px",
-                "boxShadow": "0 0 10px rgba(0,0,0,0.1)",
-                "margin": "20px 0",
-            },
+            style=summary_info_style,
         )
 
         return html.Div(
