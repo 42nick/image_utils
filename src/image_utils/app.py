@@ -27,10 +27,11 @@ button_style = {
     "borderRadius": "5px",
     "textDecoration": "none",
     "fontFamily": font_family,
+    "margin": "20px 0",  # Added margin for top and bottom
 }
 upload_style = {
     "width": "100%",
-    "height": "60px",
+    "height": "100px",
     "lineHeight": "60px",
     "borderWidth": "1px",
     "borderStyle": "dashed",
@@ -39,6 +40,9 @@ upload_style = {
     "margin": "10px",
     "backgroundColor": secondary_color,
     "fontFamily": font_family,
+    "display": "flex",
+    "alignItems": "center",
+    "justifyContent": "center",
 }
 image_style = {
     "height": "150px",
@@ -122,17 +126,21 @@ image_compressor_layout = html.Div(
             multiple=True,
         ),
         html.Div(id="upload-info", style={"textAlign": "center", "margin": "10px"}),
-        dcc.Slider(
-            id="compression-slider",
-            min=1,
-            max=100,
-            step=1,
-            value=85,
-            marks={
-                i: {"label": str(i), "style": {"color": text_color, "fontFamily": font_family}}
-                for i in range(0, 101, 10)
-            },
-            tooltip={"placement": "bottom", "always_visible": True},
+        html.Div(
+            dcc.Slider(
+                id="compression-slider",
+                min=1,
+                max=100,
+                step=1,
+                value=85,
+                marks={
+                    i: {"label": str(i), "style": {"color": text_color, "fontFamily": font_family}}
+                    for i in range(0, 101, 10)
+                },
+                tooltip={"placement": "bottom", "always_visible": True},
+            ),
+            className="slider-container",
+            style={"textAlign": "center"},
         ),
         html.Div(
             html.Button(
@@ -143,8 +151,8 @@ image_compressor_layout = html.Div(
             ),
             style={"textAlign": "center"},
         ),
-        html.Div(id="download-links"),
-        html.Div(id="output-image-upload"),
+        html.Div(id="download-links", style={"textAlign": "center"}),
+        html.Div(id="output-image-upload", style={"textAlign": "center"}),
     ],
     style={
         "maxWidth": "1000px",
@@ -154,6 +162,7 @@ image_compressor_layout = html.Div(
         "borderRadius": "10px",
         "backgroundColor": background_color,
         "fontFamily": font_family,
+        "textAlign": "center",
     },
 )
 
@@ -228,6 +237,7 @@ def create_image_div(compressed_image, download_filename, original_size, compres
                     "color": primary_color,
                     "textDecoration": "none",
                     "fontFamily": font_family,
+                    "fontWeight": "bold",
                 },
             ),
             html.Div(
@@ -236,6 +246,7 @@ def create_image_div(compressed_image, download_filename, original_size, compres
                     "textAlign": "center",
                     "marginTop": "10px",
                     "fontFamily": font_family,
+                    "color": text_color,
                 },
             ),
             html.Div(
@@ -244,13 +255,18 @@ def create_image_div(compressed_image, download_filename, original_size, compres
                     "textAlign": "center",
                     "marginTop": "10px",
                     "fontFamily": font_family,
+                    "color": text_color,
                 },
             ),
         ],
         style={
             "display": "inline-block",
-            "width": "200px",
+            "width": "220px",
             "margin": "10px",
+            "padding": "10px",
+            "borderRadius": "10px",
+            "boxShadow": "0 0 10px rgba(0,0,0,0.1)",
+            "backgroundColor": secondary_color,
             "verticalAlign": "top",
         },
     )
@@ -359,7 +375,7 @@ def update_output(compress_clicks, contents, filenames, compression_ratio):
                         "textAlign": "center",
                         "marginTop": "10px",
                         "fontFamily": font_family,
-                        "fontSize": "18px",
+                        "fontSize": "20px",
                         "fontWeight": "bold",
                         "color": accent_color,
                     },
