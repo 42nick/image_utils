@@ -37,6 +37,7 @@ app.layout = html.Div(
             },
             multiple=True,
         ),
+        html.Div(id="upload-info", style={"textAlign": "center", "margin": "10px"}),
         dcc.Slider(
             id="compression-slider",
             min=1,
@@ -46,29 +47,29 @@ app.layout = html.Div(
             marks={i: str(i) for i in range(0, 101, 10)},
             tooltip={"placement": "bottom", "always_visible": True},
         ),
-        html.Button(
-            "Compress Images",
-            id="compress-button",
-            n_clicks=0,
-            style={
-                "display": "inline-block",
-                "padding": "10px 20px",
-                "fontSize": "16px",
-                "color": "#fff",
-                "backgroundColor": "#007bff",
-                "border": "none",
-                "borderRadius": "5px",
-                "textDecoration": "none",
-                "textAlign": "center",
-                "margin": "10px",
-                "fontFamily": "Arial, sans-serif",
-            },
+        html.Div(
+            html.Button(
+                "Compress Images",
+                id="compress-button",
+                n_clicks=0,
+                style={
+                    "padding": "10px 20px",
+                    "fontSize": "16px",
+                    "color": "#fff",
+                    "backgroundColor": "#007bff",
+                    "border": "none",
+                    "borderRadius": "5px",
+                    "textDecoration": "none",
+                    "fontFamily": "Arial, sans-serif",
+                },
+            ),
+            style={"textAlign": "center"},
         ),
         html.Div(id="download-links"),
         html.Div(id="output-image-upload"),
     ],
     style={
-        "maxWidth": "800px",
+        "maxWidth": "1000px",
         "margin": "auto",
         "padding": "20px",
         "boxShadow": "0 0 10px rgba(0,0,0,0.1)",
@@ -96,6 +97,28 @@ def parse_contents(contents, compression_ratio):
 
     encoded_image = base64.b64encode(buffer.read()).decode("utf-8")
     return f"data:image/jpeg;base64,{encoded_image}", original_size, compressed_size
+
+
+@app.callback(
+    Output("upload-info", "children"),
+    Input("upload-image", "contents"),
+    State("upload-image", "filename"),
+)
+def update_upload_info(contents, filenames):
+    if contents is not None:
+        num_files = len(contents)
+        return html.Div(
+            [
+                html.Span(f"{num_files} image(s) uploaded.", style={"fontSize": "20px", "fontWeight": "bold"}),
+            ],
+            style={"color": "green", "textAlign": "center", "marginTop": "10px"},
+        )
+    return html.Div(
+        [
+            html.Span("0 images uploaded.", style={"fontSize": "20px", "fontWeight": "bold"}),
+        ],
+        style={"textAlign": "center", "marginTop": "10px"},
+    )
 
 
 @app.callback(
@@ -200,25 +223,29 @@ def update_output(compress_clicks, contents, filenames, compression_ratio):
         zip_buffer.seek(0)
         zip_base64 = base64.b64encode(zip_buffer.read()).decode("utf-8")
         zip_href = f"data:application/zip;base64,{zip_base64}"
-        zip_link = html.A(
-            "Download All Images as Zip",
-            id="download-zip-link",
-            download="compressed_images.zip",
-            href=zip_href,
-            target="_blank",
-            style={
-                "display": "inline-block",
-                "padding": "10px 20px",
-                "fontSize": "16px",
-                "color": "#fff",
-                "backgroundColor": "#007bff",
-                "border": "none",
-                "borderRadius": "5px",
-                "textDecoration": "none",
-                "textAlign": "center",
-                "margin": "10px",
-                "fontFamily": "Arial, sans-serif",
-            },
+
+        zip_link = html.Div(
+            html.A(
+                "Download All Images as Zip",
+                id="download-zip-link",
+                download="compressed_images.zip",
+                href=zip_href,
+                target="_blank",
+                style={
+                    "display": "inline-block",
+                    "padding": "10px 20px",
+                    "fontSize": "16px",
+                    "color": "#fff",
+                    "backgroundColor": "#007bff",
+                    "border": "none",
+                    "borderRadius": "5px",
+                    "textDecoration": "none",
+                    "textAlign": "center",
+                    "margin": "10px",
+                    "fontFamily": "Arial, sans-serif",
+                },
+            ),
+            style={"textAlign": "center"},
         )
         return html.Div(
             images_and_links,
