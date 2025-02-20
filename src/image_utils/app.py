@@ -137,6 +137,51 @@ def update_upload_info(contents, filenames):
     )
 
 
+def create_image_div(compressed_image, download_filename, original_size, compressed_size):
+    return html.Div(
+        [
+            html.Img(src=compressed_image, style=image_style),
+            html.A(
+                "Download " + download_filename,
+                id="download-link",
+                download=download_filename,
+                href=compressed_image,
+                target="_blank",
+                style={
+                    "display": "block",
+                    "textAlign": "center",
+                    "marginTop": "10px",
+                    "color": "#007bff",
+                    "textDecoration": "none",
+                    "fontFamily": font_family,
+                },
+            ),
+            html.Div(
+                f"Before: {original_size / 1024:.2f} KB",
+                style={
+                    "textAlign": "center",
+                    "marginTop": "10px",
+                    "fontFamily": font_family,
+                },
+            ),
+            html.Div(
+                f"After: {compressed_size / 1024:.2f} KB",
+                style={
+                    "textAlign": "center",
+                    "marginTop": "10px",
+                    "fontFamily": font_family,
+                },
+            ),
+        ],
+        style={
+            "display": "inline-block",
+            "width": "200px",
+            "margin": "10px",
+            "verticalAlign": "top",
+        },
+    )
+
+
 @app.callback(
     Output("output-image-upload", "children"),
     Output("download-links", "children"),
@@ -187,51 +232,7 @@ def update_output(compress_clicks, contents, filenames, compression_ratio):
                 else:
                     download_filename = "compressed_image.jpg"
                 images_and_links.append(
-                    html.Div(
-                        [
-                            html.Img(
-                                src=compressed_image,
-                                style=image_style,
-                            ),
-                            html.A(
-                                "Download " + download_filename,
-                                id="download-link",
-                                download=download_filename,
-                                href=compressed_image,
-                                target="_blank",
-                                style={
-                                    "display": "block",
-                                    "textAlign": "center",
-                                    "marginTop": "10px",
-                                    "color": "#007bff",
-                                    "textDecoration": "none",
-                                    "fontFamily": font_family,
-                                },
-                            ),
-                            html.Div(
-                                f"Before: {original_size / 1024:.2f} KB",
-                                style={
-                                    "textAlign": "center",
-                                    "marginTop": "10px",
-                                    "fontFamily": font_family,
-                                },
-                            ),
-                            html.Div(
-                                f"After: {compressed_size / 1024:.2f} KB",
-                                style={
-                                    "textAlign": "center",
-                                    "marginTop": "10px",
-                                    "fontFamily": font_family,
-                                },
-                            ),
-                        ],
-                        style={
-                            "display": "inline-block",
-                            "width": "200px",
-                            "margin": "10px",
-                            "verticalAlign": "top",
-                        },
-                    )
+                    create_image_div(compressed_image, download_filename, original_size, compressed_size)
                 )
                 image_data = base64.b64decode(compressed_image.split(",")[1])
                 zip_file.writestr(download_filename, image_data)
