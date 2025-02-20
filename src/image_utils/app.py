@@ -7,16 +7,22 @@ from dash import dcc, html
 from dash.dependencies import Input, Output, State
 from PIL import Image
 
-app = dash.Dash(__name__)
+app = dash.Dash(__name__, suppress_callback_exceptions=True)
 
 # Define reusable style variables
 font_family = "Arial, sans-serif"
-centered_text_style = {"textAlign": "center", "fontFamily": font_family}
+primary_color = "#4CAF50"  # Green
+secondary_color = "#f9f9f9"  # Light grey
+accent_color = "#FF5722"  # Orange
+text_color = "#333"  # Dark grey
+background_color = "#fff"  # White
+
+centered_text_style = {"textAlign": "center", "fontFamily": font_family, "color": text_color}
 button_style = {
     "padding": "10px 20px",
     "fontSize": "16px",
     "color": "#fff",
-    "backgroundColor": "#007bff",
+    "backgroundColor": primary_color,
     "border": "none",
     "borderRadius": "5px",
     "textDecoration": "none",
@@ -31,7 +37,7 @@ upload_style = {
     "borderRadius": "5px",
     "textAlign": "center",
     "margin": "10px",
-    "backgroundColor": "#f9f9f9",
+    "backgroundColor": secondary_color,
     "fontFamily": font_family,
 }
 image_style = {
@@ -43,18 +49,71 @@ image_style = {
     "boxShadow": "0 0 5px rgba(0,0,0,0.1)",
 }
 summary_info_style = {
-    "backgroundColor": "#f8f9fa",
+    "backgroundColor": secondary_color,
     "padding": "20px",
     "borderRadius": "10px",
     "boxShadow": "0 0 10px rgba(0,0,0,0.1)",
     "margin": "20px 0",
 }
+sidebar_style = {
+    "position": "fixed",
+    "top": 0,
+    "left": 0,
+    "bottom": 0,
+    "width": "220px",
+    "padding": "20px",
+    "backgroundColor": primary_color,
+    "color": "#fff",
+    "boxShadow": "2px 0 5px rgba(0,0,0,0.1)",
+}
+
+content_style = {
+    "marginLeft": "240px",
+    "padding": "20px",
+    "backgroundColor": background_color,
+    "fontFamily": font_family,
+}
+
+link_style = {
+    "display": "block",
+    "padding": "10px 0",
+    "color": "#fff",
+    "textDecoration": "none",
+}
+
+link_hover_style = {
+    "color": accent_color,
+}
 
 app.layout = html.Div(
     [
+        dcc.Location(id="url", refresh=False),
+        html.Div(
+            [
+                html.H2("Tools", style={"fontFamily": font_family, "color": "#fff"}),
+                html.Hr(style={"borderColor": "#fff"}),
+                html.Div(
+                    [
+                        dcc.Link("Image Compressor", href="/", style=link_style),
+                        dcc.Link("Tool 2", href="/tool2", style=link_style),
+                        dcc.Link("Tool 3", href="/tool3", style=link_style),
+                        dcc.Link("Tool 4", href="/tool4", style=link_style),
+                    ],
+                    style={"fontFamily": font_family},
+                ),
+            ],
+            style=sidebar_style,
+        ),
+        html.Div(id="page-content", style=content_style),
+    ]
+)
+
+
+image_compressor_layout = html.Div(
+    [
         html.H1(
             "Image Compressor",
-            style={**centered_text_style, "color": "#333", "marginBottom": "20px"},
+            style={**centered_text_style, "color": text_color, "marginBottom": "20px"},
         ),
         dcc.Upload(
             id="upload-image",
@@ -69,7 +128,10 @@ app.layout = html.Div(
             max=100,
             step=1,
             value=85,
-            marks={i: str(i) for i in range(0, 101, 10)},
+            marks={
+                i: {"label": str(i), "style": {"color": text_color, "fontFamily": font_family}}
+                for i in range(0, 101, 10)
+            },
             tooltip={"placement": "bottom", "always_visible": True},
         ),
         html.Div(
@@ -90,10 +152,22 @@ app.layout = html.Div(
         "padding": "20px",
         "boxShadow": "0 0 10px rgba(0,0,0,0.1)",
         "borderRadius": "10px",
-        "backgroundColor": "#fff",
+        "backgroundColor": background_color,
         "fontFamily": font_family,
     },
 )
+
+
+@app.callback(Output("page-content", "children"), [Input("url", "pathname")])
+def display_page(pathname):
+    if pathname == "/tool2":
+        return html.Div([html.H1("Tool 2", style=centered_text_style)])
+    elif pathname == "/tool3":
+        return html.Div([html.H1("Tool 3", style=centered_text_style)])
+    elif pathname == "/tool4":
+        return html.Div([html.H1("Tool 4", style=centered_text_style)])
+    else:
+        return image_compressor_layout
 
 
 def parse_contents(contents, compression_ratio):
@@ -151,7 +225,7 @@ def create_image_div(compressed_image, download_filename, original_size, compres
                     "display": "block",
                     "textAlign": "center",
                     "marginTop": "10px",
-                    "color": "#007bff",
+                    "color": primary_color,
                     "textDecoration": "none",
                     "fontFamily": font_family,
                 },
@@ -265,7 +339,7 @@ def update_output(compress_clicks, contents, filenames, compression_ratio):
                         "fontFamily": font_family,
                         "fontSize": "18px",
                         "fontWeight": "bold",
-                        "color": "#333",
+                        "color": text_color,
                     },
                 ),
                 html.Div(
@@ -276,7 +350,7 @@ def update_output(compress_clicks, contents, filenames, compression_ratio):
                         "fontFamily": font_family,
                         "fontSize": "18px",
                         "fontWeight": "bold",
-                        "color": "#333",
+                        "color": text_color,
                     },
                 ),
                 html.Div(
@@ -287,7 +361,7 @@ def update_output(compress_clicks, contents, filenames, compression_ratio):
                         "fontFamily": font_family,
                         "fontSize": "18px",
                         "fontWeight": "bold",
-                        "color": "#28a745",
+                        "color": accent_color,
                     },
                 ),
             ],
