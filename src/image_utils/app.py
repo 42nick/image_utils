@@ -133,6 +133,9 @@ def update_output(compress_clicks, contents, filenames, compression_ratio):
     if contents is not None:
         images_and_links = []
         zip_buffer = io.BytesIO()
+        total_original_size = 0
+        total_compressed_size = 0
+
         with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
             for content, filename in zip(contents, filenames):
                 if not filename.lower().endswith((".png", ".jpg", ".jpeg")):
@@ -159,6 +162,9 @@ def update_output(compress_clicks, contents, filenames, compression_ratio):
                     ), None
 
                 compressed_image, original_size, compressed_size = parse_contents(content, compression_ratio)
+                total_original_size += original_size
+                total_compressed_size += compressed_size
+
                 if filename:
                     name, ext = filename.rsplit(".", 1)
                     download_filename = f"{name}_compressed.jpg"
@@ -220,6 +226,7 @@ def update_output(compress_clicks, contents, filenames, compression_ratio):
                 )
                 image_data = base64.b64decode(compressed_image.split(",")[1])
                 zip_file.writestr(download_filename, image_data)
+
         zip_buffer.seek(0)
         zip_base64 = base64.b64encode(zip_buffer.read()).decode("utf-8")
         zip_href = f"data:application/zip;base64,{zip_base64}"
@@ -247,8 +254,56 @@ def update_output(compress_clicks, contents, filenames, compression_ratio):
             ),
             style={"textAlign": "center"},
         )
+
+        size_reduction = 100 * (total_original_size - total_compressed_size) / total_original_size
+
+        summary_info = html.Div(
+            [
+                html.Div(
+                    f"Total Original Size: {total_original_size / 1024:.2f} KB",
+                    style={
+                        "textAlign": "center",
+                        "marginTop": "10px",
+                        "fontFamily": "Arial, sans-serif",
+                        "fontSize": "18px",
+                        "fontWeight": "bold",
+                        "color": "#333",
+                    },
+                ),
+                html.Div(
+                    f"Total Compressed Size: {total_compressed_size / 1024:.2f} KB",
+                    style={
+                        "textAlign": "center",
+                        "marginTop": "10px",
+                        "fontFamily": "Arial, sans-serif",
+                        "fontSize": "18px",
+                        "fontWeight": "bold",
+                        "color": "#333",
+                    },
+                ),
+                html.Div(
+                    f"Size Reduction: {size_reduction:.2f}%",
+                    style={
+                        "textAlign": "center",
+                        "marginTop": "10px",
+                        "fontFamily": "Arial, sans-serif",
+                        "fontSize": "18px",
+                        "fontWeight": "bold",
+                        "color": "#28a745",
+                    },
+                ),
+            ],
+            style={
+                "backgroundColor": "#f8f9fa",
+                "padding": "20px",
+                "borderRadius": "10px",
+                "boxShadow": "0 0 10px rgba(0,0,0,0.1)",
+                "margin": "20px 0",
+            },
+        )
+
         return html.Div(
-            images_and_links,
+            [html.Div(summary_info), html.Div(images_and_links)],
             style={"display": "flex", "flexWrap": "wrap", "justifyContent": "center"},
         ), zip_link
     return None, None
