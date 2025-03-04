@@ -10,9 +10,9 @@ readme = "README.md"
 requires-python = ">=3.10"
 version = "0.0.1"
 [project.optional-dependencies]
-dev = ["image_utils[test]", "image_utils[docs]", "tox"]
+dev = ["image_utils[test]", "image_utils[docs]", "tox", "pre-commit"]
 docs = ["sphinx", "myst-parser", "sphinx_rtd_theme"]
-test = ["pytest", "pytest-cov", "coverage", "black", "isort", "pylint", "mypy"]
+test = ["pytest", "pytest-cov", "coverage", "black", "isort", "pylint", "mypy", "ruff"]
 
 [tool.setuptools.packages.find]
 include = [
