@@ -1,24 +1,11 @@
-import base64
-import io
-import zipfile
 
-import dash
 from dash import dcc, html
-from dash.dependencies import Input, Output, State
-from PIL import Image
 
 from image_utils.definitions import (
-    IMAGE_MAX_HEIGHT,
-    accent_color,
     background_color,
     button_style,
     centered_text_style,
-    content_style,
     font_family,
-    image_style,
-    link_style,
-    primary_color,
-    secondary_color,
     text_color,
     upload_style,
 )
