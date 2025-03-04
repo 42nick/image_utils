@@ -3,7 +3,10 @@ build-backend = "setuptools.build_meta"
 requires = ["setuptools"]
 
 [project]
-dependencies = ["dash>=2.18.2", "pillow"]
+dependencies = [
+    "dash>=2.18.2",
+ "pillow",
+]
 license = { text = "MIT License" }
 name = "image_utils"
 readme = "README.md"

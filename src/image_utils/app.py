@@ -1,5 +1,6 @@
 import base64
 import io
+import tempfile
 import zipfile
 
 import dash
@@ -23,6 +24,7 @@ from image_utils.definitions import (
     text_color,
 )
 from image_utils.pages.image_compressor_layout import image_compressor_layout
+from image_utils.pages.image_to_pdf_layout import combine_image_to_pdf
 
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
 
@@ -37,7 +39,7 @@ app.layout = html.Div(
                 html.Div(
                     [
                         dcc.Link("Image Compressor", href="/", style=link_style),
-                        dcc.Link("Tool 2", href="/tool2", style=link_style),
+                        dcc.Link("Image to PDF", href="/tool2", style=link_style),
                         dcc.Link("Tool 3", href="/tool3", style=link_style),
                         dcc.Link("Tool 4", href="/tool4", style=link_style),
                     ],
@@ -54,7 +56,7 @@ app.layout = html.Div(
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def display_page(pathname):
     if pathname == "/tool2":
-        return html.Div([html.H1("Tool 2", style=centered_text_style)])
+        return combine_image_to_pdf
     elif pathname == "/tool3":
         return html.Div([html.H1("Tool 3", style=centered_text_style)])
     elif pathname == "/tool4":
@@ -80,28 +82,6 @@ def parse_contents(contents, compression_ratio):
 
     encoded_image = base64.b64encode(buffer.read()).decode("utf-8")
     return f"data:image/jpeg;base64,{encoded_image}", original_size, compressed_size
-
-
-@app.callback(
-    Output("upload-info", "children"),
-    Input("upload-image", "contents"),
-    State("upload-image", "filename"),
-)
-def update_upload_info(contents, filenames):
-    if contents is not None:
-        num_files = len(contents)
-        return html.Div(
-            [
-                html.Span(f"{num_files} image(s) uploaded.", style={"fontSize": "20px", "fontWeight": "bold"}),
-            ],
-            style={"color": "green", "textAlign": "center", "marginTop": "10px"},
-        )
-    return html.Div(
-        [
-            html.Span("0 images uploaded.", style={"fontSize": "20px", "fontWeight": "bold"}),
-        ],
-        style={"textAlign": "center", "marginTop": "10px"},
-    )
 
 
 def create_image_div(compressed_image, download_filename, original_size, compressed_size):
@@ -174,6 +154,47 @@ def create_image_div(compressed_image, download_filename, original_size, compres
             "backgroundColor": secondary_color,
             "verticalAlign": "top",
         },
+    )
+
+
+def convert_images_to_pdf(contents_list, filenames):
+    images = []
+    for contents, filename in zip(contents_list, filenames):
+        content_type, content_string = contents.split(",")
+        decoded = base64.b64decode(content_string)
+        image = Image.open(io.BytesIO(decoded))
+
+        # Convert image to RGB if it has an alpha channel
+        if image.mode == "RGBA":
+            image = image.convert("RGB")
+
+        images.append(image)
+
+    pdf_buffer = io.BytesIO()
+    images[0].save(pdf_buffer, format="PDF", resolution=100.0, save_all=True, append_images=images[1:])
+    pdf_buffer.seek(0)
+    return pdf_buffer
+
+
+@app.callback(
+    Output("upload-info", "children"),
+    Input("upload-image", "contents"),
+    State("upload-image", "filename"),
+)
+def update_upload_info(contents, filenames):
+    if contents is not None:
+        num_files = len(contents)
+        return html.Div(
+            [
+                html.Span(f"{num_files} image(s) uploaded.", style={"fontSize": "20px", "fontWeight": "bold"}),
+            ],
+            style={"color": "green", "textAlign": "center", "marginTop": "10px"},
+        )
+    return html.Div(
+        [
+            html.Span("0 images uploaded.", style={"fontSize": "20px", "fontWeight": "bold"}),
+        ],
+        style={"textAlign": "center", "marginTop": "10px"},
     )
 
 
@@ -296,6 +317,53 @@ def update_output(compress_clicks, contents, filenames, compression_ratio):
     return None, None
 
 
+@app.callback(
+    Output("upload-info-pdf", "children"),
+    Input("upload-image-pdf", "contents"),
+    State("upload-image-pdf", "filename"),
+)
+def update_upload_info_pdf(contents, filenames):
+    if contents is not None:
+        num_files = len(contents)
+        return html.Div(
+            [
+                html.Span(f"{num_files} image(s) uploaded.", style={"fontSize": "20px", "fontWeight": "bold"}),
+            ],
+            style={"color": "green", "textAlign": "center", "marginTop": "10px"},
+        )
+    return html.Div(
+        [
+            html.Span("0 images uploaded.", style={"fontSize": "20px", "fontWeight": "bold"}),
+        ],
+        style={"textAlign": "center", "marginTop": "10px"},
+    )
+
+
+@app.callback(
+    Output("download-pdf-link", "children"),
+    Input("convert-button", "n_clicks"),
+    State("upload-image-pdf", "contents"),
+    State("upload-image-pdf", "filename"),
+)
+def convert_to_pdf(n_clicks, contents, filenames):
+    if contents is not None:
+        pdf_buffer = convert_images_to_pdf(contents, filenames)
+        pdf_base64 = base64.b64encode(pdf_buffer.read()).decode("utf-8")
+        pdf_href = f"data:application/pdf;base64,{pdf_base64}"
+
+        return html.Div(
+            html.A(
+                "Download PDF",
+                id="download-pdf",
+                download="converted_images.pdf",
+                href=pdf_href,
+                target="_blank",
+                style=button_style,
+            ),
+            style={"textAlign": "center"},
+        )
+    return None
+
+
 if __name__ == "__main__":
-    app.run_server(debug=True)
     app.run_server(debug=True)
