@@ -1,6 +1,5 @@
 import base64
 import io
-import tempfile
 import zipfile
 
 import dash

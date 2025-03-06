@@ -15,4 +15,3 @@ repos:
         args: [--fix]
       - id: ruff
         name: ruff-format
-
